@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { openai, printShopSystemPrompt } from '@/lib/openai';
 
-export async function POST(req: Request) {
+export const dynamic = 'force-dynamic';
+
+export async function POST(request: Request) {
   try {
-    const { messages } = await req.json();
+    const { messages } = await request.json();
 
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
