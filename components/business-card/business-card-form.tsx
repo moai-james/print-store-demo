@@ -3,14 +3,6 @@
 import { BusinessCardData } from "@/app/business-card/page";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { FileUpload } from "@/components/business-card/file-upload";
 
 interface BusinessCardFormProps {
   data: BusinessCardData;
@@ -18,181 +10,156 @@ interface BusinessCardFormProps {
 }
 
 export function BusinessCardForm({ data, onChange }: BusinessCardFormProps) {
-  const handleChange = (
-    field: string,
-    value: string,
-    section?: string,
-    subfield?: string
+  const handleNestedChange = (
+    section: keyof BusinessCardData,
+    subfield: string,
+    value: string
   ) => {
-    if (section && subfield) {
+    // Type guard to ensure we're working with an object
+    const sectionData = data[section];
+    if (typeof sectionData === 'object' && sectionData !== null) {
       onChange({
         ...data,
         [section]: {
-          ...data[section as keyof BusinessCardData],
+          ...sectionData,
           [subfield]: value,
         },
-      });
-    } else {
-      onChange({
-        ...data,
-        [field]: value,
       });
     }
   };
 
   return (
     <div className="space-y-6">
-      <Accordion type="single" collapsible defaultValue="personal">
-        <AccordionItem value="personal">
-          <AccordionTrigger>Personal Information</AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  value={data.name}
-                  onChange={(e) => handleChange("name", e.target.value)}
-                  placeholder="John Doe"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="jobTitle">Job Title</Label>
-                <Input
-                  id="jobTitle"
-                  value={data.jobTitle}
-                  onChange={(e) => handleChange("jobTitle", e.target.value)}
-                  placeholder="Software Engineer"
-                />
-              </div>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+      {/* Basic Information */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">基本資訊</h3>
+        <div className="grid gap-4">
+          <div>
+            <Label htmlFor="name">姓名</Label>
+            <Input
+              id="name"
+              value={data.name}
+              onChange={(e) => onChange({ ...data, name: e.target.value })}
+            />
+          </div>
+          <div>
+            <Label htmlFor="jobTitle">職稱</Label>
+            <Input
+              id="jobTitle"
+              value={data.jobTitle}
+              onChange={(e) => onChange({ ...data, jobTitle: e.target.value })}
+            />
+          </div>
+        </div>
+      </div>
 
-        <AccordionItem value="contact">
-          <AccordionTrigger>Contact Information</AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={data.phone}
-                  onChange={(e) => handleChange("phone", e.target.value)}
-                  placeholder="+1 (555) 123-4567"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={data.email}
-                  onChange={(e) => handleChange("email", e.target.value)}
-                  placeholder="john@example.com"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="website">Website (Optional)</Label>
-                <Input
-                  id="website"
-                  type="url"
-                  value={data.website}
-                  onChange={(e) => handleChange("website", e.target.value)}
-                  placeholder="https://example.com"
-                />
-              </div>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+      {/* Contact Information */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">聯絡資訊</h3>
+        <div className="grid gap-4">
+          <div>
+            <Label htmlFor="phone">電話</Label>
+            <Input
+              id="phone"
+              value={data.phone}
+              onChange={(e) => onChange({ ...data, phone: e.target.value })}
+            />
+          </div>
+          <div>
+            <Label htmlFor="email">電子郵件</Label>
+            <Input
+              id="email"
+              value={data.email}
+              onChange={(e) => onChange({ ...data, email: e.target.value })}
+            />
+          </div>
+          <div>
+            <Label htmlFor="website">網站</Label>
+            <Input
+              id="website"
+              value={data.website}
+              onChange={(e) => onChange({ ...data, website: e.target.value })}
+            />
+          </div>
+        </div>
+      </div>
 
-        <AccordionItem value="social">
-          <AccordionTrigger>Social Media</AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="linkedin">LinkedIn Profile</Label>
-                <Input
-                  id="linkedin"
-                  value={data.socialLinks.linkedin}
-                  onChange={(e) =>
-                    handleChange("socialLinks", e.target.value, "linkedin")
-                  }
-                  placeholder="linkedin.com/in/johndoe"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="twitter">Twitter Handle</Label>
-                <Input
-                  id="twitter"
-                  value={data.socialLinks.twitter}
-                  onChange={(e) =>
-                    handleChange("socialLinks", e.target.value, "twitter")
-                  }
-                  placeholder="@johndoe"
-                />
-              </div>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+      {/* Social Links */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">社群連結</h3>
+        <div className="grid gap-4">
+          <div>
+            <Label htmlFor="linkedin">LinkedIn</Label>
+            <Input
+              id="linkedin"
+              value={data.socialLinks.linkedin}
+              onChange={(e) =>
+                handleNestedChange("socialLinks", "linkedin", e.target.value)
+              }
+            />
+          </div>
+          <div>
+            <Label htmlFor="twitter">Twitter</Label>
+            <Input
+              id="twitter"
+              value={data.socialLinks.twitter}
+              onChange={(e) =>
+                handleNestedChange("socialLinks", "twitter", e.target.value)
+              }
+            />
+          </div>
+        </div>
+      </div>
 
-        <AccordionItem value="company">
-          <AccordionTrigger>Company Information</AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="companyName">Company Name</Label>
-                <Input
-                  id="companyName"
-                  value={data.company.name}
-                  onChange={(e) =>
-                    handleChange("company", e.target.value, "name")
-                  }
-                  placeholder="Acme Inc."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Company Logo</Label>
-                <FileUpload
-                  value={data.company.logo}
-                  onChange={(value) =>
-                    handleChange("company", value, "logo")
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="companyAddress">Company Address</Label>
-                <Textarea
-                  id="companyAddress"
-                  value={data.company.address}
-                  onChange={(e) =>
-                    handleChange("company", e.target.value, "address")
-                  }
-                  placeholder="123 Business St, Suite 100&#10;City, State 12345"
-                  rows={3}
-                />
-              </div>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+      {/* Company Information */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">公司資訊</h3>
+        <div className="grid gap-4">
+          <div>
+            <Label htmlFor="companyName">公司名稱</Label>
+            <Input
+              id="companyName"
+              value={data.company.name}
+              onChange={(e) =>
+                handleNestedChange("company", "name", e.target.value)
+              }
+            />
+          </div>
+          <div>
+            <Label htmlFor="companyLogo">公司標誌 URL</Label>
+            <Input
+              id="companyLogo"
+              value={data.company.logo}
+              onChange={(e) =>
+                handleNestedChange("company", "logo", e.target.value)
+              }
+            />
+          </div>
+          <div>
+            <Label htmlFor="companyAddress">公司地址</Label>
+            <Input
+              id="companyAddress"
+              value={data.company.address}
+              onChange={(e) =>
+                handleNestedChange("company", "address", e.target.value)
+              }
+            />
+          </div>
+        </div>
+      </div>
 
-        <AccordionItem value="additional">
-          <AccordionTrigger>Additional Information</AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-2">
-              <Label htmlFor="additionalInfo">Additional Details</Label>
-              <Textarea
-                id="additionalInfo"
-                value={data.additionalInfo}
-                onChange={(e) => handleChange("additionalInfo", e.target.value)}
-                placeholder="Add a slogan, tagline, or any other information..."
-                rows={3}
-              />
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+      {/* Additional Information */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">其他資訊</h3>
+        <div>
+          <Label htmlFor="additionalInfo">補充資訊</Label>
+          <Input
+            id="additionalInfo"
+            value={data.additionalInfo}
+            onChange={(e) => onChange({ ...data, additionalInfo: e.target.value })}
+          />
+        </div>
+      </div>
     </div>
   );
 }
